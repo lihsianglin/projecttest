@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>歌詞製作測試</title>
+	<style type="text/css">
+		.clickable-words {
+			color: blue;
+			margin-left: 5px;
+			margin-right: 5px;
+		}
+
+		.clickable-words:hover {
+			text-decoration: underline;
+			cursor: pointer;
+		}
+
+		#lyricsDiv {
+			display: inline-block;
+			height: 400px;
+			overflow: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		var tag = document.createElement('script');
+		tag.src = "https://www.youtube.com/iframe_api";
+		var firstScriptTag = document.getElementsByTagName('script')[0];
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+		var player;
+		var vid;
+		
+
+		function getYTVideo() {
+			var yturl = document.getElementsByName("yturl")[0].value;
+			var lyricsDiv = document.getElementById("lyricsDiv");
+			var content;
+			vid = getVidFromUrl(yturl);
+			player = new YT.Player('player', {
+		    height: '400',
+		    width: '640',
+		    videoId: vid
+		 	});
+
+		 	content = "<textarea id='totalLyrics' rows='25' cols='75'></textarea>" +
+		 			  "<button onclick='cutLyrics()'>提交</button>";
+		 	lyricsDiv.innerHTML = content;
+			document.getElementsByTagName("body")[0].removeChild(document.getElementsByTagName("div")[0]); 
+		}
+
+		function cutLyrics() {
+			var lyricsDiv = document.getElementById("lyricsDiv");
+			var totalLyrics = document.getElementById("totalLyrics");
+			var all_lyrics = totalLyrics.value.split("\n");
+			var content = '';
+			for(var i = 0; i < all_lyrics.length; i++) {
+				if(all_lyrics[i] !== "") {
+					content += '<div class="partLyricsDiv">' +
+							   '<input type="Text" name="lyricsText" value="' + all_lyrics[i] + '" size="60">' +
+							   '<input type="Text" name="sText" size="5" placeholder="開始">' +
+							   '<button onclick="seekVideoTime()">測試</button>' +
+							   '<input type="Text" name="eText" size="5" placeholder="結束">' +
+							   '<button onclick="seekVideoTime()">測試</button>' +
+							   //讓span可以被focus: tabindex="0"(預設為-1)
+							   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
+							   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>' +
+							   '</div>';
+				}
+			}
+			lyricsDiv.innerHTML = content;
+			document.getElementsByName("sText")[0].focus();
+		}
+
+
+		function seekVideoTime() {
+			var Time = document.activeElement.previousElementSibling.value;
+			if(parseInt(Time)) {
+				player.seekTo(Time);
+			}
+
+		}
+
+		function delPartLyrics() {
+			var partLyricsDiv = document.activeElement.parentElement;
+			var parent = partLyricsDiv.parentElement;
+			parent.removeChild(partLyricsDiv);
+
+		}
+
+		function insertPartLyrics() {
+			var nextDiv;
+			var parent = document.activeElement.parentElement.parentElement;
+			var newDiv = document.createElement("div");
+			var content = '';
+			content += '<input type="Text" name="lyricsText" size="60">' +
+					   '<input type="Text" name="sText" size="5" placeholder="開始">' +
+					   '<button onclick="seekVideoTime()">測試</button>' +
+				       '<input type="Text" name="eText" size="5" placeholder="結束">' +
+					   '<button onclick="seekVideoTime()">測試</button>' +
+					   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
+					   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>';
+
+			newDiv.setAttribute("class", "partLyricsDiv");
+			newDiv.innerHTML = content;
+
+			nextDiv = document.activeElement.parentElement.nextElementSibling;
+			if(nextDiv) {
+				parent.insertBefore(newDiv, nextDiv);
+			}
+			else {
+				parent.appendChild(newDiv);
+			}
+		}
+
+		function getVidFromUrl(url) {
+			var vid = url.split("/")[3];
+			if(vid.match("v="))	{
+				vid = vid.split("v=")[1];
+				if(vid.match("&")) {
+					vid = vid.split("&")[0];
+					return vid;
+				}
+				else {
+					return vid;
+				}
+			}
+			else {
+				return vid;
+			}
+		}
+
+		function getVideoTimeFromSpace() {
+			actElment = document.activeElement;
+			var nextElement;
+			if(actElment && actElment.name === "sText") {
+				actElment.value = player.getCurrentTime().toFixed(2);
+				nextElement = actElment.nextElementSibling.nextElementSibling;
+				nextElement.focus();
+			}
+			else if(actElment && actElment.name === "eText") {
+				actElment.value = player.getCurrentTime().toFixed(2);
+				if(actElment.parentElement.nextElementSibling) {
+					nextElement = actElment.parentElement.nextElementSibling.children[1];
+					nextElement.focus();
+				}
+			}
+		}
+
+		document.onkeydown = function() {
+			key = event.keyCode;
+			if(key == 32) {				//key space
+				getVideoTimeFromSpace();
+			}
+		}
+	</script>
+</head>
+
+<body>
+	<div>
+		<label>輸入Youtube URL:
+			<input type="text" name="yturl">
+		</label>
+		<button onclick="getYTVideo()">開始</button>
+	</div>
+	<div id="player"></div>
+	<div id="lyricsDiv"></div>
+	
+</body>
+</html>
