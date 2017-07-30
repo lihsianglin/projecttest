@@ -16,10 +16,11 @@
 		}
 
 		#lyricsDiv {
-			display: inline-block;
-			height: 400px;
+			height: 375px;
+			width: 750px;
 			overflow: auto;
 		}
+
 	</style>
 	<script type="text/javascript">
 		var tag = document.createElement('script');
@@ -33,7 +34,8 @@
 
 		function getYTVideo() {
 			var yturl = document.getElementsByName("yturl")[0].value;
-			var lyricsDiv = document.getElementById("lyricsDiv");
+			var form = document.getElementsByTagName("form")[0];
+			var btnDiv = document.getElementById("btnDiv");
 			var content;
 			vid = getVidFromUrl(yturl);
 			player = new YT.Player('player', {
@@ -42,17 +44,19 @@
 		    videoId: vid
 		 	});
 
-		 	content = "<textarea id='totalLyrics' rows='25' cols='75'></textarea>" +
-		 			  "<button onclick='cutLyrics()'>提交</button>";
-		 	lyricsDiv.innerHTML = content;
+		 	content = "<textarea id='totalLyrics' rows='25' cols='75'></textarea>";
+		 	form.innerHTML = content;
+		 	btnDiv.innerHTML = "<button onclick='cutLyrics()'>提交</button>";
 			document.getElementsByTagName("body")[0].removeChild(document.getElementsByTagName("div")[0]); 
 		}
 
 		function cutLyrics() {
-			var lyricsDiv = document.getElementById("lyricsDiv");
 			var totalLyrics = document.getElementById("totalLyrics");
+			var btnDiv = document.getElementById("btnDiv");
+			var form = document.getElementsByTagName("form")[0];
 			var all_lyrics = totalLyrics.value.split("\n");
 			var content = '';
+
 			for(var i = 0; i < all_lyrics.length; i++) {
 				if(all_lyrics[i] !== "") {
 					content += '<div class="partLyricsDiv">' +
@@ -67,8 +71,15 @@
 							   '</div>';
 				}
 			}
-			lyricsDiv.innerHTML = content;
+
+			form.innerHTML = content;
+			btnDiv.innerHTML = '<button onclick="submitForm()">提交</button>';
 			document.getElementsByName("sText")[0].focus();
+		}
+
+		function submitForm() {
+			var form = document.getElementsByTagName("form")[0];
+			form.submit();
 		}
 
 
@@ -163,7 +174,10 @@
 		<button onclick="getYTVideo()">開始</button>
 	</div>
 	<div id="player"></div>
-	<div id="lyricsDiv"></div>
-	
+	<div id="lyricsDiv">
+		<form method="post" action=".">
+		</form>
+	</div>
+	<div id="btnDiv"></div>
 </body>
 </html>

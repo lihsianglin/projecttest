@@ -14,8 +14,8 @@ class VideoPage(models.Model):
 
 class Lyrics(models.Model):
 	page_id = models.ForeignKey(VideoPage)
-	start_time = models.IntegerField(max_length=5)
-	end_time = models.IntegerField(max_length=5)
+	start_time = models.FloatField()
+	end_time = models.FloatField()
 	content = models.CharField(max_length=100)
 	
 
