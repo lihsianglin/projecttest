@@ -9,11 +9,11 @@ class VideoPage(models.Model):
 
 
 	def __str__(self):
-		return self.page_title;
+		return str(self.page_id);
 
 
 class Lyrics(models.Model):
-	page_id = models.ForeignKey(VideoPage)
+	videoPage = models.ForeignKey(VideoPage)
 	start_time = models.FloatField()
 	end_time = models.FloatField()
 	content = models.CharField(max_length=100)

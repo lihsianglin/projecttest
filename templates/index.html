@@ -30,6 +30,7 @@
 
 		var player;
 		var vid;
+		var title;
 		
 
 		function getYTVideo() {
@@ -55,16 +56,17 @@
 			var btnDiv = document.getElementById("btnDiv");
 			var form = document.getElementsByTagName("form")[0];
 			var all_lyrics = totalLyrics.value.split("\n");
-			var content = '';
+			var content = '<input type="text" name="title", size=100 placeholder="標題">' +
+						  '<input type="hidden" name="vid" value="'+ vid +'">';
 
 			for(var i = 0; i < all_lyrics.length; i++) {
 				if(all_lyrics[i] !== "") {
 					content += '<div class="partLyricsDiv">' +
-							   '<input type="Text" name="lyricsText" value="' + all_lyrics[i] + '" size="60">' +
-							   '<input type="Text" name="sText" size="5" placeholder="開始">' +
-							   '<button onclick="seekVideoTime()">測試</button>' +
-							   '<input type="Text" name="eText" size="5" placeholder="結束">' +
-							   '<button onclick="seekVideoTime()">測試</button>' +
+							   '<input type="text" name="lyricsText" value="' + all_lyrics[i] + '" size="60">' +
+							   '<input type="text" name="sText" size="5" placeholder="開始">' +
+							   '<button type="button" onclick="seekVideoTime()">測試</button>' +
+							   '<input type="text" name="eText" size="5" placeholder="結束">' +
+							   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 							   //讓span可以被focus: tabindex="0"(預設為-1)
 							   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
 							   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>' +
@@ -79,14 +81,36 @@
 
 		function submitForm() {
 			var form = document.getElementsByTagName("form")[0];
+			var sTexts = document.getElementsByName("sText");
+			var eTexts = document.getElementsByName("eText");
+			var title = document.getElementsByName("title")[0].value;
+			var message = "請正確輸入標題與所有時間欄位";
+			if(title) {
+				for(var i = 0; i < sTexts.length; i++) {
+					if(!sTexts[i].value || isNaN(sTexts[i].value)) {
+						window.alert(message);
+						return; 
+					}
+				}
+				for(var i = 0; i < eTexts.length; i++) {
+					if(!eTexts[i].value || isNaN(eTexts[i].value)) {
+						window.alert(message);
+						return; 
+					}
+				}
+			}
+			else {
+				window.alert(message);
+				return;
+			}
 			form.submit();
 		}
 
 
 		function seekVideoTime() {
-			var Time = document.activeElement.previousElementSibling.value;
-			if(parseInt(Time)) {
-				player.seekTo(Time);
+			var time = document.activeElement.previousElementSibling.value;
+			if(parseInt(time)) {
+				player.seekTo(time);
 			}
 
 		}
@@ -105,9 +129,9 @@
 			var content = '';
 			content += '<input type="Text" name="lyricsText" size="60">' +
 					   '<input type="Text" name="sText" size="5" placeholder="開始">' +
-					   '<button onclick="seekVideoTime()">測試</button>' +
+					   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 				       '<input type="Text" name="eText" size="5" placeholder="結束">' +
-					   '<button onclick="seekVideoTime()">測試</button>' +
+					   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 					   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
 					   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>';
 
@@ -141,17 +165,23 @@
 		}
 
 		function getVideoTimeFromSpace() {
-			actElment = document.activeElement;
+			var actElement = document.activeElement;
 			var nextElement;
-			if(actElment && actElment.name === "sText") {
-				actElment.value = player.getCurrentTime().toFixed(2);
-				nextElement = actElment.nextElementSibling.nextElementSibling;
+			if(actElement && actElement.name === "sText") {
+				actElement.value = player.getCurrentTime().toFixed(2);
+				if(actElement.parentElement.nextElementSibling) {
+					nextElement = actElement.parentElement.nextElementSibling.children[1];
+				}
+				else {
+					nextElement = actElement.parentElement.parentElement.children[2].children[3];
+				}
 				nextElement.focus();
+				
 			}
-			else if(actElment && actElment.name === "eText") {
-				actElment.value = player.getCurrentTime().toFixed(2);
-				if(actElment.parentElement.nextElementSibling) {
-					nextElement = actElment.parentElement.nextElementSibling.children[1];
+			else if(actElement && actElement.name === "eText") {
+				actElement.value = player.getCurrentTime().toFixed(2);
+				if(actElement.parentElement.nextElementSibling) {
+					nextElement = actElement.parentElement.nextElementSibling.children[3];
 					nextElement.focus();
 				}
 			}
