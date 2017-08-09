@@ -17,7 +17,7 @@
 
 		#lyricsDiv {
 			height: 375px;
-			width: 750px;
+			width: 800px;
 			overflow: auto;
 		}
 
@@ -66,7 +66,6 @@
 							   '<input type="text" name="sText" size="5" placeholder="開始">' +
 							   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 							   '<input type="text" name="eText" size="5" placeholder="結束">' +
-							   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 							   //讓span可以被focus: tabindex="0"(預設為-1)
 							   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
 							   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>' +
@@ -92,8 +91,15 @@
 						return; 
 					}
 				}
-				for(var i = 0; i < eTexts.length; i++) {
-					if(!eTexts[i].value || isNaN(eTexts[i].value)) {
+				if(!eTexts[eTexts.length-1].value || isNaN(eTexts[eTexts.length-1].value)) {
+					window.alert(message);
+					return; 
+				}
+				for(var i = 0; i < eTexts.length-1; i++) {
+					if(!eTexts[i].value) {
+						eTexts[i].value = sTexts[i+1].value - 0.3;
+					}
+					if(isNaN(eTexts[i].value)) {
 						window.alert(message);
 						return; 
 					}
@@ -131,7 +137,6 @@
 					   '<input type="Text" name="sText" size="5" placeholder="開始">' +
 					   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 				       '<input type="Text" name="eText" size="5" placeholder="結束">' +
-					   '<button type="button" onclick="seekVideoTime()">測試</button>' +
 					   '<span class="clickable-words" onclick="delPartLyrics()" tabindex="0">刪除</span>' +
 					   '<span class="clickable-words" onclick="insertPartLyrics()" tabindex="0">插入</span>';
 
@@ -171,9 +176,6 @@
 				actElement.value = player.getCurrentTime().toFixed(2);
 				if(actElement.parentElement.nextElementSibling) {
 					nextElement = actElement.parentElement.nextElementSibling.children[1];
-				}
-				else {
-					nextElement = actElement.parentElement.parentElement.children[2].children[3];
 				}
 				nextElement.focus();
 				
